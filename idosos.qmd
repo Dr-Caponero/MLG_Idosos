@@ -36,8 +36,8 @@ format:
 library(pacman)
 
 pacman::p_load(tidyverse,  readit, summarytools,
-               kableExtra, moYments, ggpubr, formattable, gridExtra, 
-               glue, corrplot, sessioninfo, readxl, writexl, ggthemes,
+               kableExtra,  ggpubr,  gridExtra, 
+               glue, corrplot,  readxl, writexl, ggthemes,
                patchwork,  plotly, gglm, ggplot2, tidymodels)
 
 dados <- read_excel("idosos.xlsx")
@@ -107,11 +107,13 @@ Com base nos dados é possível avaliar um modelo de regressão logistico.
 #| warning: false
 
 fit_l <- glm(resp~score, data=dados, family = binomial(link="logit"))
-anova_l <- anova(fit_l)
-rownames(anova_l) <- c("Intercepto", "Beta 1")
+tab_l <- summary(fit_l)
+tab_l <- tab_l$coefficients
+rownames(tab_l) <- c("Intercepto", "Beta 1")
+colnames(tab_l) <- c("Estimado", "SD", "z", "Pr(>|z|)")
 parametros_l <- confint(fit_l)
-anova_l <- round(anova_l,3)
-anova_l %>%
+#anova_l <- round(anova_l,3)
+tab_l %>%
   kbl(
     caption = "Resultados da ANOVA, para o modelo com função de ligação logito.",
     digits = 4,
@@ -133,11 +135,12 @@ anova_l %>%
 #| warning: false
 
 fit_p <- glm(resp~score, data=dados, family = binomial(link="probit"))
-anova_p <- anova(fit_p)
-rownames(anova_p) <- c("Intercepto", "Beta 1")
+tab_p <- summary(fit_p)
+tab_p <- tab_p$coefficients
+rownames(tab_p) <- c("Intercepto", "Beta 1")
+colnames(tab_p) <- c("Estimado", "SD", "z", "Pr(>|z|)")
 parametros_p <- confint(fit_p)
-anova_p <- round(anova_p,3)
-anova_p %>%
+tab_p %>%
   kbl(
     caption = "Resultados da ANOVA, para o modelo com função de ligação probito.",
     digits = 4,
@@ -161,11 +164,12 @@ anova_p %>%
 #| warning: false
 
 fit_c <- glm(resp~score, data=dados, family = binomial(link="cauchit"))
-anova_c <- anova(fit_c)
-rownames(anova_c) <- c("Intercepto", "Beta 1")
+tab_c <- summary(fit_c)
+tab_c <- tab_c$coefficients
+rownames(tab_c) <- c("Intercepto", "Beta 1")
+colnames(tab_c) <- c("Estimado", "SD", "z", "Pr(>|z|)")
 parametros_c <- confint(fit_c)
-anova_c <- round(anova_c,3)
-anova_c %>%
+tab_c %>%
   kbl(
     caption = "Resultados da ANOVA, para o modelo com função de ligação cauchit.",
     digits = 4,
@@ -226,12 +230,48 @@ Desta forma, verifica-se que a diferença entre os modelos é bastante sutil e n
 ## Resultados Inferenciais.
 
 ### Estimativas pontuais
-Uma tabela contendo as estimativas dos parâmetros, erros padrões e p-valores. 
+
+Com base no modelo escolhido é possível estimar os valores de $\beta$ e $\phi$ para o modelo.
+
+```{r}
+#| echo: false
+#| warning: false
+
+Y <- as.numeric(dados$resp)-1
+X <- dados$score
+n <- length(Y)
+xx <- cbind(1,X)
+phi <- n
+
+#chute inicial
+alpha <- 1
+beta <- 0.1
+
+# inicio das iterações
+k <- 0
+while(TRUE){
+    k <- k+1
+    eta <- alpha + beta*X
+    mu <- exp(eta)/(1-exp(eta))
+    V <- diag((mu)*(1-mu))
+    W <- V
+    Kbb <- phi*t(xx)%*%W%*%xx
+    Kbb_inv <- solve(Kbb)
+    z <- eta + solve(V)%*%(Y-mu)
+    beta_it <- phi*Kbb_inv%*%t(xx)%*%W%*%z
+    if(beta_it[1]-alpha<0.000001 & beta_it[2]-beta<0.000001) break
+    alpha <- beta_it[1]
+    beta <- beta_it[2]
+}
+```
+
+Os valores estimados foram de $\alpha =$ `r round(alpha,4)` e de $\beta_1 =$ `r round(beta,4)`. Com `r k` iterações obteve-se a precisão de $10^{-6}$.
+
 
 ### Discussão dos resultados
 Interpretação dos resultados. 
 
-###Função Desvio
+### Função Desvio
 Interpretação da função desvio. 
 Compare o valor da função desvio com a estatística qui-quadrado e interprete o resultado do teste de
 hipótese.
@@ -241,7 +281,7 @@ Apresente o gráfico da função de distribuição acumulada logística (veja Au
 Plote o gráfico de $\hat z$ versus $\hat \eta$ e comente sobre as evidências de adequacidade da função de ligação.
 
 
-###Análise Residual. 
+### Análise Residual. 
 Considerando os resíduos Studentizado (tsi) padronizado e o componente do desvio padronizado (tdi) apresente os seguintes gráficos tsi, tdi versus valores ajustados, tsi , tdi versus valores observados e os respectivos gráficos do envelope simulado.
 
 ### Observações Atípicas
