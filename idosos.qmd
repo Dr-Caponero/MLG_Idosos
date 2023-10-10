@@ -27,6 +27,9 @@ format:
           \usepackage{xcolor}
           \usepackage{indentfirst}
           \captionsetup[table]{name=Tabela}
+editor: 
+  markdown: 
+    wrap: 72
 ---
 
 ```{r pacotes&dados}
@@ -34,7 +37,7 @@ format:
 #| warning: false
 
 library(pacman)
-
+library(GGally)
 pacman::p_load(tidyverse,  readit, summarytools,
                kableExtra,  ggpubr,  gridExtra, 
                glue, corrplot,  readxl, writexl, ggthemes,
@@ -47,16 +50,19 @@ Com <- dados |> filter(resp==1)
 Sem <- dados |> filter(resp==0)
 ```
 
-## Introdução 
+## Introdução
 
-Cinquenta e quatro indivíduos considerados idosos são submetidos a um exame psiquiátrico para avaliar a ocorrência ou não de sintoma de caduquice. (Agresti, 1990, pgs. 122-123).
-Acredita-se que o escore obtido num exame psicológico feito previamente esteja associado com
-a ocorrência ou não do sintoma. Este trabalho propõe um modelo de regressão logística para estudar
-esta relação. 
-
+Cinquenta e quatro indivíduos considerados idosos são submetidos a um
+exame psiquiátrico para avaliar a ocorrência ou não de sintoma de
+caduquice. (Agresti, 1990, pgs. 122-123). Acredita-se que o escore
+obtido num exame psicológico feito previamente esteja associado com a
+ocorrência ou não do sintoma. Este trabalho propõe um modelo de
+regressão logística para estudar esta relação.
 
 ## Análise descritiva
-Conduziu-se uma análise descritiva dos dados, com objetivo de entender um pouco mais as variáveis consideradas. A tabela 1 apresenta os resultados obtidos.
+
+Conduziu-se uma análise descritiva dos dados, com objetivo de entender
+um pouco mais as variáveis consideradas.
 
 ```{r}
 #| echo: false
@@ -80,8 +86,9 @@ tab <- rbind(tab_com,tab_sem)
 rownames(tab) <- c("Com Caducância", "Sem Caducância")
 tab|>
     kbl(
-    caption = "Medidas resumo da variável score",
+    caption = "Tabela com as estatísticas-resumo para a variável score dos idosos com ou sem caducância",
     digits = 2,
+    label = 'tbl-t1' ,
     format.args=list(big.mark=".", decimal.mark=","),
     align = "c", row.names = T, booktabs = T
   )|>
@@ -95,12 +102,37 @@ tab|>
 
 ```
 
-Nota-se que os dados referêntes aos scores obtidos pelos idosos é similar para ambas as condições, muito embora os scores obtidos pelos idosos sem patologia seja em média superior porém com um desvio padrão também maior. Outro fator importante é que ambas as distribuições são relativamente simétricas diferindo cum pouco quanto a curtose. O coeficiênte de variação apresenta uma ligeira diferença que associada às diferentes médias pode siginificar um comportamento destinto dos dois grupos.
+Na Tabela 1, é possível observar que a média dos scores para os idosos
+com caducância é menor do que para os sem caducância. A média e a
+mediana para ambos cenários aparentam estar bem próximas entre si, além
+da métrica de simetria estar próxima de zero, indicando que a
+distribuição dos scores é simétrica para os idosos com ou sem
+caducância. Para a curtose, é notável que a distribuição dos scores para
+os idosos com caducância é mais platicúrtica que para os idosos sem
+caducância.
 
+```{r}
+#| echo: false
+#| warning: false
+#| mensage: false
+#| fig-cap: "Boxplot para a variável score dos idosos com ou sem caducância"
+#| label: fig-f1
+p <- ggplot(dados, aes(x=resp, y=score)) + 
+  geom_boxplot()
+p
 
-## Modelo 
+```
+
+Através dos boxplots da @fig-f1, é possível observar que para os idosos
+sem caducância, existe uma maior variabilidade dos scores abaixo da
+mediana, enquanto que para os scores dos com caducância há uma
+variabilidade maior entre a mediana e o terceiro quartil. Tanto pela
+Tabela 1 quanto pela @fig-f1, já é possível notar que há uma tendência a
+qual menores scores estão mais associados com idosos com caducância.
+
+## Modelo
+
 Com base nos dados é possível avaliar um modelo de regressão logistico.
-
 
 ```{r}
 #| echo: false
@@ -157,8 +189,6 @@ tab_p %>%
   kable_material()
 ```
 
-
-
 ```{r}
 #| echo: false
 #| warning: false
@@ -186,8 +216,9 @@ tab_c %>%
   kable_material()
 ```
 
-Os modelos apresentados nas tabelas 2, 3 e 4 são bastante similares. Uma comparação mais acurada dos modelos pode ser verificada a partir dos valores de AIC atingidos. A Tabela 5 mostra esses valores.
-
+Os modelos apresentados nas tabelas 2, 3 e 4 são bastante similares. Uma
+comparação mais acurada dos modelos pode ser verificada a partir dos
+valores de AIC atingidos. A Tabela 5 mostra esses valores.
 
 ```{r}
 #| echo: false
@@ -223,15 +254,17 @@ tab %>%
   kable_material()
 ```
 
-Desta forma, verifica-se que a diferença entre os modelos é bastante sutil e não há necessidade de se valer de uma função de ligação diferente da canônica para explicar os dados. Assim a função de ligação logito é preferível dentre as demais.
-
-
+Desta forma, verifica-se que a diferença entre os modelos é bastante
+sutil e não há necessidade de se valer de uma função de ligação
+diferente da canônica para explicar os dados. Assim a função de ligação
+logito é preferível dentre as demais.
 
 ## Resultados Inferenciais.
 
 ### Estimativas pontuais
 
-Com base no modelo escolhido é possível estimar os valores de $\beta$ e $\phi$ para o modelo.
+Com base no modelo escolhido é possível estimar os valores de $\beta$ e
+$\phi$ para o modelo.
 
 ```{r}
 #| echo: false
@@ -265,24 +298,33 @@ while(TRUE){
 }
 ```
 
-Os valores estimados foram de $\alpha =$ `r round(alpha,4)` e de $\beta_1 =$ `r round(beta,4)`. Com `r k` iterações obteve-se a precisão de $10^{-6}$.
-
+Os valores estimados foram de $\alpha =$ `r round(alpha,4)` e de
+$\beta_1 =$ `r round(beta,4)`. Com `r k` iterações obteve-se a precisão
+de $10^{-6}$.
 
 ### Discussão dos resultados
-Interpretação dos resultados. 
+
+Interpretação dos resultados.
 
 ### Função Desvio
-Interpretação da função desvio. 
-Compare o valor da função desvio com a estatística qui-quadrado e interprete o resultado do teste de
-hipótese.
+
+Interpretação da função desvio. Compare o valor da função desvio com a
+estatística qui-quadrado e interprete o resultado do teste de hipótese.
 
 ### Gráficos
-Apresente o gráfico da função de distribuição acumulada logística (veja Aula prática III - dados turbine). 
-Plote o gráfico de $\hat z$ versus $\hat \eta$ e comente sobre as evidências de adequacidade da função de ligação.
 
+Apresente o gráfico da função de distribuição acumulada logística (veja
+Aula prática III - dados turbine). Plote o gráfico de $\hat z$ versus
+$\hat \eta$ e comente sobre as evidências de adequacidade da função de
+ligação.
 
-### Análise Residual. 
-Considerando os resíduos Studentizado (tsi) padronizado e o componente do desvio padronizado (tdi) apresente os seguintes gráficos tsi, tdi versus valores ajustados, tsi , tdi versus valores observados e os respectivos gráficos do envelope simulado.
+### Análise Residual.
+
+Considerando os resíduos Studentizado (tsi) padronizado e o componente
+do desvio padronizado (tdi) apresente os seguintes gráficos tsi, tdi
+versus valores ajustados, tsi , tdi versus valores observados e os
+respectivos gráficos do envelope simulado.
 
 ### Observações Atípicas
+
 Identifique as observações atípicas. Comente cada gráfico.
