@@ -144,13 +144,11 @@ onde
 
 * $x_{i}$ é a variável score
 * $\frac{\mu_{i}}{1-\mu_{i}}$ é a chance
-<<<<<<< HEAD
 * $\alpha$ é o efeito escalar no logarítmo da chance do idoso apresentar caducância 
 * $\beta$ é efeito no logarítmo da chance do idoso apresentar caducância quando uma unidade é adicionada na variável score
 * $exp(\beta)$ é efeito na razão da chance do idoso apresentar caducância quando uma unidade é adicionada na variável score
 
 * $\alpha$ é o efeito escalar no logarítmo da chance do idoso apresentar caducância ou não.
->>>>>>> 9610b2c6020a17eaaccde81bc345be04f935dda2
 
 
 Com base nos dados é possível avaliar um modelo de regressão logístico.
