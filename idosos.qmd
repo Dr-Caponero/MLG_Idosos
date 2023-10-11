@@ -132,7 +132,7 @@ qual menores scores estão mais associados com idosos com caducância.
 
 ## Modelo
 
-Queremos analisar como o valor do score obtido no exame psicológico impacta na chance de idoso apresentar caducância ou não. Desse modo, o modelo a ser definido será o modelo MLG binomial com função de ligação logito, então sendo Y a variável que indica se o idoso apresenta caducância ou não, temos que
+Queremos analisar como o valor do score obtido no exame psicológico impacta na chance de idoso apresentar caducância ou não. Desse modo, o modelo a ser definido será o modelo MLG binomial com função de ligação logito, então sendo $Y_{i}$ a variável que indica se o idoso "i" apresenta caducância ou não, temos que
 
 * $Y_{i}\sim Binomial(1,\mu_{i})$
 * $log(\frac{\mu_{i}}{1-\mu_{i}}) = \alpha + \beta x_{i}$
@@ -141,8 +141,10 @@ onde que
 
 * $x_{i}$ é a variável score
 * $\frac{\mu_{i}}{1-\mu_{i}}$ é a chance
-* $\alpha$ é o efeito escalar no logarítmo da chance do idoso apresentar caducância ou não
-* 
+* $\alpha$ é o efeito escalar no logarítmo da chance do idoso apresentar caducância 
+* $\beta$ é efeito no logarítmo da chance do idoso apresentar caducância quando uma unidade é adicionada na variável score
+* $exp(\beta)$ é efeito na razão da chance do idoso apresentar caducância quando uma unidade é adicionada na variável score
+
 
 
 Com base nos dados é possível avaliar um modelo de regressão logistico.
