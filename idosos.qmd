@@ -149,7 +149,6 @@ onde
 * $\beta$ é efeito no logarítmo da chance do idoso apresentar caducância quando uma unidade é adicionada na variável score
 * $exp(\beta)$ é efeito na razão da chance do idoso apresentar caducância quando uma unidade é adicionada na variável score
 
-=======
 * $\alpha$ é o efeito escalar no logarítmo da chance do idoso apresentar caducância ou não.
 >>>>>>> 9610b2c6020a17eaaccde81bc345be04f935dda2
 
@@ -367,7 +366,7 @@ do desvio padronizado (tdi) apresente os seguintes gráficos tsi, tdi
 versus valores ajustados, tsi , tdi versus valores observados e os
 respectivos gráficos do envelope simulado.
 
-```{R}
+```{r }
 #| echo: false
 #| warning: false
 X <- model.matrix(fit)
@@ -400,7 +399,7 @@ ggplot() +
   theme_bw() 
 ```
 
-```{R}
+```{r }
 #| echo: false
 #| warning: false
 
@@ -423,7 +422,9 @@ ggplot() +
 Identifique as observações atípicas. Comente cada gráfico.
 
 ```{r}
-# Envelope td
+#| echo: false
+#| warning: false
+
 fit.model <- fit
 par(mfrow=c(1,2))
 X <- model.matrix(fit.model)
