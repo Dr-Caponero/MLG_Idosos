@@ -55,17 +55,14 @@ Sem <- dados |> filter(resp==0)
 
 ## Introdução
 
-Cinquenta e quatro indivíduos considerados idosos são submetidos a um
-exame psiquiátrico para avaliar a ocorrência ou não de sintoma de
-caduquice. (Agresti, 1990, pgs. 122-123). Acredita-se que o escore
-obtido num exame psicológico feito previamente esteja associado com a
-ocorrência ou não do sintoma. Este trabalho propõe um modelo de
-regressão logística para estudar esta relação.
+É importante a compreensão das mudanças psicológicas associadas ao envelhecimento. Por isso, este trabalho tem como objetivo analisar um grupo de cinquenta e quatro indivíduos considerados idosos, submetidos a um exame psiquiátrico para avaliar a presença ou ausência de sintomas de caduquice. Acredita-se que os escores obtidos em exames psicológicos prévios podem estar relacionados com a ocorrência desses sintomas. Assim, a presente pesquisa propõe a utilização de um modelo de regressão logística para investigar essa relação.
+
+Os dados são provenientes de (Agresti, 1990, pgs. 122-123). Ao longo deste trabalho, será realizada uma análise descritiva com objetivo de entender um pouco mais as variáveis consideradas, a construção do modelo de regressão com diferentes funções de ligação, a apresentação de resultados inferenciais e estimativas pontuais. Além disso, também será apresentado a análise de resíduos, com foco na identificação de observações atípicas. 
+
 
 ## Análise descritiva
 
-Conduziu-se uma análise descritiva dos dados, com objetivo de entender
-um pouco mais as variáveis consideradas.
+Na amostra de idosos incluídos no estudo, 74% não demonstraram sinais de caduquice. A Tabela 1 apresenta um resumo dos escores registrados por esses idosos.
 
 ```{r}
 #| echo: false
@@ -283,7 +280,7 @@ sutil e não há necessidade de se valer de uma função de ligação
 diferente da canônica para explicar os dados. Assim a função de ligação
 logito é preferível dentre as demais.
 
-## Resultados Inferenciais.
+## Resultados Inferenciais
 
 ### Estimativas pontuais
 
@@ -328,7 +325,8 @@ de $10^{-6}$.
 
 ### Discussão dos resultados
 
-Interpretação dos resultados.
+Todos os coeficientes foram significativos ao nível de 5\%. Como a variável score não assume valor zero, o coeficiente do intercepto não apresenta interpretabilidade. A variável score apresenta um coeficiente de -0.3235. Isso indica que, a chance do idoso apresentar caduquice com o aumento de uma unidade na variável score é exp(-0.3235) = 0.7236.
+
 
 ### Função Desvio
 
@@ -369,7 +367,7 @@ ggplot()+
   theme_minimal(base_size = 12)
 ```
 
-### Análise Residual.
+### Análise Residual
 
 Considerando os resíduos Studentizado (tsi) padronizado e o componente
 do desvio padronizado (tdi) apresente os seguintes gráficos tsi, tdi
