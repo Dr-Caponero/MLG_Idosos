@@ -330,8 +330,8 @@ Todos os coeficientes foram significativos ao nível de 5\%. Como a variável sc
 
 ### Função Desvio
 
-Interpretação da função desvio. Compare o valor da função desvio com a
-estatística qui-quadrado e interprete o resultado do teste de hipótese.
+O deviance residual é menor do que a deviance nulo 61.806 e 51.017, respectivamente, e também é mais próximo dos graus de liberdade, o que sugere que o modelo com a variável score se ajusta melhor aos dados do que um modelo que não inclui essa variável. Isso indica que a variável score tem algum poder explicativo na variabilidade da caduquice em idosos e contribui para a melhoria do ajuste do modelo.
+
 
 ### Gráficos
 
