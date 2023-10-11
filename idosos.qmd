@@ -44,6 +44,7 @@ pacman::p_load(tidyverse,  readit, summarytools,
                patchwork,  plotly, gglm, ggplot2, tidymodels)
 
 dados <- read_excel("idosos.xlsx")
+df <- dados
 dados$resp <- as.factor(dados$resp)
 dados2 <- NULL
 Com <- dados |> filter(resp==1)
@@ -86,7 +87,7 @@ tab <- rbind(tab_com,tab_sem)
 rownames(tab) <- c("Com Caducância", "Sem Caducância")
 tab|>
     kbl(
-    caption = "Tabela com as estatísticas-resumo para a variável score dos idosos com ou sem caducância",
+    caption = "Estatísticas-resumo para a variável score dos idosos com ou sem caducância",
     digits = 2,
     label = 'tbl-t1' ,
     format.args=list(big.mark=".", decimal.mark=","),
@@ -118,7 +119,9 @@ caducância.
 #| fig-cap: "Boxplot para a variável score dos idosos com ou sem caducância"
 #| label: fig-f1
 p <- ggplot(dados, aes(x=resp, y=score)) + 
-  geom_boxplot()
+  geom_boxplot()+
+  scale_x_discrete(labels=c("Sem caduquice", "Com caduquice"))+
+  theme_bw()
 p
 
 ```
@@ -137,15 +140,14 @@ Queremos analisar como o valor do score obtido no exame psicológico impacta na 
 * $Y_{i}\sim Binomial(1,\mu_{i})$
 * $log(\frac{\mu_{i}}{1-\mu_{i}}) = \alpha + \beta x_{i}$
 
-onde que
+onde
 
 * $x_{i}$ é a variável score
 * $\frac{\mu_{i}}{1-\mu_{i}}$ é a chance
-* $\alpha$ é o efeito escalar no logarítmo da chance do idoso apresentar caducância ou não
-* 
+* $\alpha$ é o efeito escalar no logarítmo da chance do idoso apresentar caducância ou não.
 
 
-Com base nos dados é possível avaliar um modelo de regressão logistico.
+Com base nos dados é possível avaliar um modelo de regressão logístico.
 
 ```{r}
 #| echo: false
@@ -154,13 +156,13 @@ Com base nos dados é possível avaliar um modelo de regressão logistico.
 fit_l <- glm(resp~score, data=dados, family = binomial(link="logit"))
 tab_l <- summary(fit_l)
 tab_l <- tab_l$coefficients
-rownames(tab_l) <- c("Intercepto", "Beta 1")
-colnames(tab_l) <- c("Estimado", "SD", "z", "Pr(>|z|)")
+rownames(tab_l) <- c("Intercepto", "Score")
+colnames(tab_l) <- c("Estimativa", "EP", "Est. z", "Pr(>|z|)")
 parametros_l <- confint(fit_l)
-#anova_l <- round(anova_l,3)
+
 tab_l %>%
   kbl(
-    caption = "Resultados da ANOVA, para o modelo com função de ligação logito.",
+    caption = "Resultados para o modelo com função de ligação logito.",
     digits = 4,
     format.args=list(big.mark=".", decimal.mark=","),
     align = "c", 
@@ -182,12 +184,12 @@ tab_l %>%
 fit_p <- glm(resp~score, data=dados, family = binomial(link="probit"))
 tab_p <- summary(fit_p)
 tab_p <- tab_p$coefficients
-rownames(tab_p) <- c("Intercepto", "Beta 1")
-colnames(tab_p) <- c("Estimado", "SD", "z", "Pr(>|z|)")
+rownames(tab_p) <- c("Intercepto", "Score")
+colnames(tab_p) <- c("Estimativa", "EP", "Est. z", "Pr(>|z|)")
 parametros_p <- confint(fit_p)
 tab_p %>%
   kbl(
-    caption = "Resultados da ANOVA, para o modelo com função de ligação probito.",
+    caption = "Resultados para o modelo com função de ligação probito.",
     digits = 4,
     format.args=list(big.mark=".", decimal.mark=","),
     align = "c", 
@@ -209,12 +211,12 @@ tab_p %>%
 fit_c <- glm(resp~score, data=dados, family = binomial(link="cauchit"))
 tab_c <- summary(fit_c)
 tab_c <- tab_c$coefficients
-rownames(tab_c) <- c("Intercepto", "Beta 1")
-colnames(tab_c) <- c("Estimado", "SD", "z", "Pr(>|z|)")
+rownames(tab_c) <- c("Intercepto", "Score")
+colnames(tab_c) <- c("Estimativa", "EP", "Est. z", "Pr(>|z|)")
 parametros_c <- confint(fit_c)
 tab_c %>%
   kbl(
-    caption = "Resultados da ANOVA, para o modelo com função de ligação cauchit.",
+    caption = "Resultados para o modelo com função de ligação cauchy.",
     digits = 4,
     format.args=list(big.mark=".", decimal.mark=","),
     align = "c", 
@@ -229,7 +231,7 @@ tab_c %>%
   kable_material()
 ```
 
-Os modelos apresentados nas tabelas 2, 3 e 4 são bastante similares. Uma
+Os modelos apresentados nas Tabelas 2, 3 e 4 são bastante similares. Uma
 comparação mais acurada dos modelos pode ser verificada a partir dos
 valores de AIC atingidos. A Tabela 5 mostra esses valores.
 
@@ -247,12 +249,12 @@ aic_l <- round(aic_l,4)
 aic_p <- round(aic_p,4)
 aic_c <- round(aic_c,4)
 
-tab <- cbind(c("Logito", "Probito", "Cauchit"), c(aic_l,aic_p,aic_c))
+tab <- cbind(c("Logito", "Probito", "Cauchy"), c(aic_l,aic_p,aic_c))
 colnames(tab) <- c("Função", "AIC")
 
 tab %>%
   kbl(
-    caption = "Valores de AIC dos modelos da ANOVA, para cada função de ligação.",
+    caption = "Valores de AIC dos modelos para cada função de ligação.",
     digits = 4,
     format.args=list(big.mark=".", decimal.mark=","),
     align = "c", 
@@ -331,6 +333,26 @@ Aula prática III - dados turbine). Plote o gráfico de $\hat z$ versus
 $\hat \eta$ e comente sobre as evidências de adequacidade da função de
 ligação.
 
+```{R}
+#| echo: false
+#| warning: false
+#Kbb
+fit <- fit_l
+w <- fit$weights
+W<-diag(w)
+v<-fit$fitted.values*(1-fit$fitted.values)
+V<-diag(v)
+Kbb<-(t(X)%*%W%*%X)
+
+#Adequacidade da função de ligação
+eta <- fit$linear.predictors
+z <- eta + (df$resp-fit$fitted.values)/(fit$fitted.values*(1-fit$fitted.values))
+
+ggplot()+
+  geom_point(aes(x=eta,y=z))+
+  theme_bw()
+```
+
 ### Análise Residual.
 
 Considerando os resíduos Studentizado (tsi) padronizado e o componente
@@ -341,8 +363,6 @@ respectivos gráficos do envelope simulado.
 ```{R}
 #| echo: false
 #| warning: false
-# Gráficos td tg ts2 e ld
-fit <- fit_l
 X <- model.matrix(fit)
 n <- nrow(X)
 p <- ncol(X)
