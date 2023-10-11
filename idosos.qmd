@@ -325,6 +325,65 @@ do desvio padronizado (tdi) apresente os seguintes gráficos tsi, tdi
 versus valores ajustados, tsi , tdi versus valores observados e os
 respectivos gráficos do envelope simulado.
 
+```{R}
+#| echo: false
+#| warning: false
+# Gráficos td tg ts2 e ld
+fit <- fit_l
+X <- model.matrix(fit)
+n <- nrow(X)
+p <- ncol(X)
+w <- fit$weights
+W <- diag(w)
+H <- solve(t(X)%*%W%*%X)
+H <- sqrt(W)%*%X%*%H%*%t(X)%*%sqrt(W)
+h <- diag(H)
+ts <- resid(fit,type="pearson")/sqrt(1-h)
+ts2 <- (ts^2)
+td <- resid(fit,type="deviance")/sqrt(1-h)
+di <- (h/(1-h))*(ts^2)
+tg <- sign(td)*sqrt((1-h)*(td^2)+h*(ts2))
+a <- max(td)
+b <- min(td)
+
+
+ggplot() +
+  aes(x=fitted(fit), y = td)+
+  geom_point()+
+  labs(x = "Valores ajustados", y = "Resíduo Componente do Desvio")+
+ theme_bw() | 
+
+ggplot() +
+  aes(x=fitted(fit), y = ts)+
+  geom_point()+
+  labs(x = "Valores ajustados", y = "Resíduo Studentizado")+
+  theme_bw() 
+```
+
+```{R}
+#| echo: false
+#| warning: false
+
+obs <- 1:54
+ggplot() +
+  aes(x = obs, y = td)+
+  geom_point()+
+  labs(x = "Observações", y = "Resíduo Componente do Desvio")+
+  theme_bw() |
+
+ggplot() +
+  aes(x = obs, y = ts)+
+  geom_point()+
+  labs(x = "Observações", y = "Resíduo Studentizado") +
+  theme_bw()
+```
+
 ### Observações Atípicas
 
 Identifique as observações atípicas. Comente cada gráfico.
+
+
+
+
+
+
