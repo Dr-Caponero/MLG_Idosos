@@ -51,6 +51,8 @@ Com <- dados |> filter(resp==1)
 Sem <- dados |> filter(resp==0)
 ```
 
+\newpage
+
 ## Introdução
 
 Cinquenta e quatro indivíduos considerados idosos são submetidos a um
@@ -121,7 +123,11 @@ caducância.
 p <- ggplot(dados, aes(x=resp, y=score)) + 
   geom_boxplot()+
   scale_x_discrete(labels=c("Sem caduquice", "Com caduquice"))+
-  theme_bw()
+  labs(
+    x = "",
+    y = "Valor do Score"
+  )+
+  theme_minimal(base_size = 12)
 p
 
 ```
@@ -147,7 +153,6 @@ onde
 * $\alpha$ é o efeito escalar no logarítmo da chance do idoso apresentar caducância 
 * $\beta$ é efeito no logarítmo da chance do idoso apresentar caducância quando uma unidade é adicionada na variável score
 * $exp(\beta)$ é efeito na razão da chance do idoso apresentar caducância quando uma unidade é adicionada na variável score
-
 * $\alpha$ é o efeito escalar no logarítmo da chance do idoso apresentar caducância ou não.
 
 
@@ -340,6 +345,9 @@ ligação.
 ```{R}
 #| echo: false
 #| warning: false
+#| fig-cap: "Função de distribuição acumulada logística"
+#| label: fig-f2
+
 #Kbb
 fit <- fit_l
 w <- fit$weights
@@ -354,7 +362,11 @@ z <- eta + (df$resp-fit$fitted.values)/(fit$fitted.values*(1-fit$fitted.values))
 
 ggplot()+
   geom_point(aes(x=eta,y=z))+
-  theme_bw()
+  labs(
+    x = expression(eta),
+    y = "Valor de z"
+  )+
+  theme_minimal(base_size = 12)
 ```
 
 ### Análise Residual.
@@ -367,6 +379,9 @@ respectivos gráficos do envelope simulado.
 ```{r }
 #| echo: false
 #| warning: false
+#| fig-cap: "Análise residual. (a) Valores ajustados em função dos resíduos; (b) Valores ajustados em função dos resíduos studentizados."
+#| label: fig-f3
+
 X <- model.matrix(fit)
 n <- nrow(X)
 p <- ncol(X)
@@ -387,31 +402,33 @@ b <- min(td)
 ggplot() +
   aes(x=fitted(fit), y = td)+
   geom_point()+
-  labs(x = "Valores ajustados", y = "Resíduo Componente do Desvio")+
- theme_bw() | 
-
+  labs(x = "(a) Valores ajustados", y = "Resíduo Componente do Desvio")+
+ theme_bw() |
+  
 ggplot() +
   aes(x=fitted(fit), y = ts)+
   geom_point()+
-  labs(x = "Valores ajustados", y = "Resíduo Studentizado")+
+  labs(x = "(b) Valores ajustados", y = "Resíduo Studentizado")+
   theme_bw() 
 ```
 
 ```{r }
 #| echo: false
 #| warning: false
+#| fig-cap: "Análise residual. (a) Observações em função dos resíduos; (b) Observações em função dos resíduos studentizados."
+#| label: fig-f4
 
 obs <- 1:54
 ggplot() +
   aes(x = obs, y = td)+
   geom_point()+
-  labs(x = "Observações", y = "Resíduo Componente do Desvio")+
+  labs(x = "(a) Observações", y = "Resíduo Componente do Desvio")+
   theme_bw() |
 
 ggplot() +
   aes(x = obs, y = ts)+
   geom_point()+
-  labs(x = "Observações", y = "Resíduo Studentizado") +
+  labs(x = "(b) Observações", y = "Resíduo Studentizado") +
   theme_bw()
 ```
 
@@ -422,6 +439,8 @@ Identifique as observações atípicas. Comente cada gráfico.
 ```{r}
 #| echo: false
 #| warning: false
+#| fig-cap: "Análise de ajuste do modelo. (a) Componentes do desvio; (b) Resíduo de Willians."
+#| label: fig-f5
 
 fit.model <- fit
 par(mfrow=c(1,2))
@@ -523,6 +542,8 @@ qqnorm(med,axes=F,xlab="", ylab="", type="l",ylim=faixa,lty=2)
 
 ```
 
+## Referências
 
+Agresti A. (1990). Categorical Data Analysis. John Wiley, New York.
 
 
