@@ -53,7 +53,7 @@ Sem <- dados |> filter(resp==0)
 
 \newpage
 
-## Introdução
+# Introdução
 
 É importante a compreensão das mudanças psicológicas associadas ao envelhecimento. Por isso, este trabalho tem como objetivo analisar um grupo de cinquenta e quatro indivíduos considerados idosos, submetidos a um exame psiquiátrico para avaliar a presença ou ausência de sintomas de caduquice. Acredita-se que os escores obtidos em exames psicológicos prévios podem estar relacionados com a ocorrência desses sintomas. Assim, a presente pesquisa propõe a utilização de um modelo de regressão logística para investigar essa relação.
 
@@ -77,9 +77,9 @@ onde
 * $\alpha$ é o efeito escalar no logarítmo da chance do idoso apresentar caducância ou não.
 
 
-## Resultados
+# Resultados
 
-### Análise descritiva
+## Análise descritiva
 
 Na amostra de idosos incluídos no estudo, 74% não demonstraram sinais de caduquice. A Tabela 1 apresenta um resumo dos escores registrados por esses idosos.
 
@@ -156,9 +156,10 @@ Tabela 1 quanto pela @fig-f1, já é possível notar que há uma tendência a
 qual menores scores estão mais associados com idosos com caducância.
 
 
-### Modelo de regressão logística
+## Modelo de regressão logística
 
-Com base nos dados é possível avaliar um modelo de regressão logístico.
+
+Na Tabela 2 abaixo, podemos notar as estimativas do intercepto ($\alpha$) e do coeficiente da variável score ($\beta$) foram significativas ao nível de 5%. Como a variável score não assume valor zero, o coeficiente do intercepto não apresenta interpretabilidade. O valor do coeficiente do score foi igual a -0,3235, ou seja,  adicionar uma unidade na variável score é responsável por uma diminuição de 0,3235 no logarítmo da chance do idoso apresentar caducância. Outra interpretação é que adicionar uma unidade na variável score é reponsável por uma dimunuição de 27,64%($1-exp(-0,3235) = 0,2764$) na chance do idoso apresentar caduância.
 
 ```{r}
 #| echo: false
@@ -188,6 +189,7 @@ tab_l %>%
   kable_material()
 ```
 
+
 Todos os coeficientes foram significativos ao nível de 5\%. Como a variável score não assume valor zero, o coeficiente do intercepto não apresenta interpretabilidade. A variável score apresenta um coeficiente de -0.3235. Isso indica que, a chance do idoso apresentar caduquice com o aumento de uma unidade na variável score é exp(-0.3235) = 0.7236.
 
 O deviance residual é menor do que a deviance nulo 61.806 e 51.017, respectivamente, e também é mais próximo dos graus de liberdade, o que sugere que o modelo com a variável score se ajusta melhor aos dados do que um modelo que não inclui essa variável. Isso indica que a variável score tem algum poder explicativo na variabilidade da caduquice em idosos.
@@ -202,11 +204,11 @@ O deviance residual é menor do que a deviance nulo 61.806 e 51.017, respectivam
 
 #Kbb
 fit <- fit_l
+X <- model.matrix(fit)
 w <- fit$weights
 W<-diag(w)
 v<-fit$fitted.values*(1-fit$fitted.values)
 V<-diag(v)
-X <- model.matrix(fit)
 Kbb<-(t(X)%*%W%*%X)
 
 #Adequacidade da função de ligação
@@ -219,11 +221,11 @@ ggplot()+
     x = expression(eta),
     y = "Valor de z"
   )+
-  theme_bw(base_size = 12)
+  theme_minimal(base_size = 12)
 ```
 
 
-### Estimativas pontuais
+## Estimativas pontuais
 
 Com base no modelo escolhido é possível estimar os valores de $\beta$ e
 $\phi$ para o modelo.
@@ -265,9 +267,13 @@ $\beta_1 =$ `r round(beta,4)`. Com `r k` iterações obteve-se a precisão
 de $10^{-6}$.
 
 
+## Função Desvio
+
+O deviance residual é menor do que a deviance nulo 61.806 e 51.017, respectivamente, e também é mais próximo dos graus de liberdade, o que sugere que o modelo com a variável score se ajusta melhor aos dados do que um modelo que não inclui essa variável. Isso indica que a variável score tem algum poder explicativo na variabilidade da caduquice em idosos e contribui para a melhoria do ajuste do modelo.
 
 
-### Análise Residual
+
+## Análise Residual
 
 Considerando os resíduos Studentizado (tsi) padronizado e o componente
 do desvio padronizado (tdi) apresente os seguintes gráficos tsi, tdi
@@ -330,7 +336,7 @@ ggplot() +
   theme_bw()
 ```
 
-### Observações Atípicas
+## Observações Atípicas
 
 Identifique as observações atípicas. Comente cada gráfico.
 
@@ -440,7 +446,7 @@ qqnorm(med,axes=F,xlab="", ylab="", type="l",ylim=faixa,lty=2)
 
 ```
 
-## Referências
+# Referências
 
 Agresti A. (1990). Categorical Data Analysis. John Wiley, New York.
 
