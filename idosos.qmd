@@ -53,7 +53,7 @@ Sem <- dados |> filter(resp==0)
 
 \newpage
 
-## Introdução
+# Introdução
 
 É importante a compreensão das mudanças psicológicas associadas ao envelhecimento. Por isso, este trabalho tem como objetivo analisar um grupo de cinquenta e quatro indivíduos considerados idosos, submetidos a um exame psiquiátrico para avaliar a presença ou ausência de sintomas de caduquice. Acredita-se que os escores obtidos em exames psicológicos prévios podem estar relacionados com a ocorrência desses sintomas. Assim, a presente pesquisa propõe a utilização de um modelo de regressão logística para investigar essa relação.
 
@@ -136,8 +136,8 @@ variabilidade maior entre a mediana e o terceiro quartil. Tanto pela
 Tabela 1 quanto pela @fig-f1, já é possível notar que há uma tendência a
 qual menores scores estão mais associados com idosos com caducância.
 
-## Modelo
-
+# Modelo de Regressão Logístico
+## Definição
 Queremos analisar como o valor do score obtido no exame psicológico impacta na chance de idoso apresentar caducância ou não. Desse modo, o modelo a ser definido será o modelo MLG binomial com função de ligação logito, então sendo $Y_{i}$ a variável que indica se o idoso "i" apresenta caducância ou não, temos que
 
 * $Y_{i}\sim Binomial(1,\mu_{i})$
@@ -152,8 +152,9 @@ onde
 * $exp(\beta)$ é efeito na razão da chance do idoso apresentar caducância quando uma unidade é adicionada na variável score
 * $\alpha$ é o efeito escalar no logarítmo da chance do idoso apresentar caducância ou não.
 
+## Resultados Inferenciais
 
-Com base nos dados é possível avaliar um modelo de regressão logístico.
+Na Tabela 2 abaixo, podemos notar as estimativas do intercepto ($\alpha$) e do coeficiente da variável score ($\beta$) foram significativas ao nível de 5%. O valor do coeficiente do score foi igual a -0,3235, ou seja,  adicionar uma unidade na variável score é responsável por uma diminuição de 0,3235 no logarítmo da chance do idoso apresentar caducância. Outra interpretação é que adicionar uma unidade na variável score é reponsável por uma dimunuição de $exp(1)$
 
 ```{r}
 #| echo: false
@@ -280,7 +281,6 @@ sutil e não há necessidade de se valer de uma função de ligação
 diferente da canônica para explicar os dados. Assim a função de ligação
 logito é preferível dentre as demais.
 
-## Resultados Inferenciais
 
 ### Estimativas pontuais
 
