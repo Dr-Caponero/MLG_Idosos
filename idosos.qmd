@@ -60,7 +60,26 @@ Sem <- dados |> filter(resp==0)
 Os dados são provenientes de (Agresti, 1990, pgs. 122-123). Ao longo deste trabalho, será realizada uma análise descritiva com objetivo de entender um pouco mais as variáveis consideradas, a construção do modelo de regressão com diferentes funções de ligação, a apresentação de resultados inferenciais e estimativas pontuais. Além disso, também será apresentado a análise de resíduos, com foco na identificação de observações atípicas. 
 
 
-## Análise descritiva
+## Modelo
+
+Queremos analisar como o valor do score obtido no exame psicológico impacta na chance de idoso apresentar caducância ou não. Desse modo, o modelo a ser definido será o modelo MLG binomial com função de ligação logito, então sendo $Y_{i}$ a variável que indica se o idoso "i" apresenta caducância ou não, temos que
+
+* $Y_{i}\sim Binomial(1,\mu_{i})$
+* $log(\frac{\mu_{i}}{1-\mu_{i}}) = \alpha + \beta x_{i}$
+
+onde
+
+* $x_{i}$ é a variável score
+* $\frac{\mu_{i}}{1-\mu_{i}}$ é a chance
+* $\alpha$ é o efeito escalar no logarítmo da chance do idoso apresentar caducância 
+* $\beta$ é efeito no logarítmo da chance do idoso apresentar caducância quando uma unidade é adicionada na variável score
+* $exp(\beta)$ é efeito na razão da chance do idoso apresentar caducância quando uma unidade é adicionada na variável score
+* $\alpha$ é o efeito escalar no logarítmo da chance do idoso apresentar caducância ou não.
+
+
+## Resultados
+
+### Análise descritiva
 
 Na amostra de idosos incluídos no estudo, 74% não demonstraram sinais de caduquice. A Tabela 1 apresenta um resumo dos escores registrados por esses idosos.
 
@@ -124,7 +143,7 @@ p <- ggplot(dados, aes(x=resp, y=score)) +
     x = "",
     y = "Valor do Score"
   )+
-  theme_minimal(base_size = 12)
+  theme_bw(base_size = 12)
 p
 
 ```
@@ -136,22 +155,8 @@ variabilidade maior entre a mediana e o terceiro quartil. Tanto pela
 Tabela 1 quanto pela @fig-f1, já é possível notar que há uma tendência a
 qual menores scores estão mais associados com idosos com caducância.
 
-## Modelo
 
-Queremos analisar como o valor do score obtido no exame psicológico impacta na chance de idoso apresentar caducância ou não. Desse modo, o modelo a ser definido será o modelo MLG binomial com função de ligação logito, então sendo $Y_{i}$ a variável que indica se o idoso "i" apresenta caducância ou não, temos que
-
-* $Y_{i}\sim Binomial(1,\mu_{i})$
-* $log(\frac{\mu_{i}}{1-\mu_{i}}) = \alpha + \beta x_{i}$
-
-onde
-
-* $x_{i}$ é a variável score
-* $\frac{\mu_{i}}{1-\mu_{i}}$ é a chance
-* $\alpha$ é o efeito escalar no logarítmo da chance do idoso apresentar caducância 
-* $\beta$ é efeito no logarítmo da chance do idoso apresentar caducância quando uma unidade é adicionada na variável score
-* $exp(\beta)$ é efeito na razão da chance do idoso apresentar caducância quando uma unidade é adicionada na variável score
-* $\alpha$ é o efeito escalar no logarítmo da chance do idoso apresentar caducância ou não.
-
+### Modelo de regressão logística
 
 Com base nos dados é possível avaliar um modelo de regressão logístico.
 
@@ -183,104 +188,40 @@ tab_l %>%
   kable_material()
 ```
 
-```{r }
+Todos os coeficientes foram significativos ao nível de 5\%. Como a variável score não assume valor zero, o coeficiente do intercepto não apresenta interpretabilidade. A variável score apresenta um coeficiente de -0.3235. Isso indica que, a chance do idoso apresentar caduquice com o aumento de uma unidade na variável score é exp(-0.3235) = 0.7236.
+
+O deviance residual é menor do que a deviance nulo 61.806 e 51.017, respectivamente, e também é mais próximo dos graus de liberdade, o que sugere que o modelo com a variável score se ajusta melhor aos dados do que um modelo que não inclui essa variável. Isso indica que a variável score tem algum poder explicativo na variabilidade da caduquice em idosos.
+
+
+
+```{R}
 #| echo: false
 #| warning: false
+#| fig-cap: "Função de distribuição acumulada logística"
+#| label: fig-f2
 
-fit_p <- glm(resp~score, data=dados, family = binomial(link="probit"))
-tab_p <- summary(fit_p)
-tab_p <- tab_p$coefficients
-rownames(tab_p) <- c("Intercepto", "Score")
-colnames(tab_p) <- c("Estimativa", "EP", "Est. z", "Pr(>|z|)")
-parametros_p <- confint(fit_p)
-tab_p %>%
-  kbl(
-    caption = "Resultados para o modelo com função de ligação probito.",
-    digits = 4,
-    format.args=list(big.mark=".", decimal.mark=","),
-    align = "c", 
-    row.names = T,
-  ) %>%
-  kable_styling(
-    full_width = F, position = 'center', 
-    latex_options = c("striped", "HOLD_position", "repeat_header")
-  )|>
-  column_spec(1, bold = T
-  )|>
-  kable_material()
+#Kbb
+fit <- fit_l
+w <- fit$weights
+W<-diag(w)
+v<-fit$fitted.values*(1-fit$fitted.values)
+V<-diag(v)
+X <- model.matrix(fit)
+Kbb<-(t(X)%*%W%*%X)
+
+#Adequacidade da função de ligação
+eta <- fit$linear.predictors
+z <- eta + (df$resp-fit$fitted.values)/(fit$fitted.values*(1-fit$fitted.values))
+
+ggplot()+
+  geom_point(aes(x=eta,y=z))+
+  labs(
+    x = expression(eta),
+    y = "Valor de z"
+  )+
+  theme_bw(base_size = 12)
 ```
 
-```{r}
-#| echo: false
-#| warning: false
-
-fit_c <- glm(resp~score, data=dados, family = binomial(link="cauchit"))
-tab_c <- summary(fit_c)
-tab_c <- tab_c$coefficients
-rownames(tab_c) <- c("Intercepto", "Score")
-colnames(tab_c) <- c("Estimativa", "EP", "Est. z", "Pr(>|z|)")
-parametros_c <- confint(fit_c)
-tab_c %>%
-  kbl(
-    caption = "Resultados para o modelo com função de ligação cauchy.",
-    digits = 4,
-    format.args=list(big.mark=".", decimal.mark=","),
-    align = "c", 
-    row.names = T,
-  ) %>%
-  kable_styling(
-    full_width = F, position = 'center', 
-    latex_options = c("striped", "HOLD_position", "repeat_header")
-  )|>
-  column_spec(1, bold = T
-  )|>
-  kable_material()
-```
-
-Os modelos apresentados nas Tabelas 2, 3 e 4 são bastante similares. Uma
-comparação mais acurada dos modelos pode ser verificada a partir dos
-valores de AIC atingidos. A Tabela 5 mostra esses valores.
-
-```{r}
-#| echo: false
-#| warning: false
-
-aic_l <- summary(fit_l)[5]
-aic_p <- summary(fit_p)[5]
-aic_c <- summary(fit_c)[5]
-aic_l <- as.numeric(aic_l)
-aic_p <- as.numeric(aic_p)
-aic_c <- as.numeric(aic_c)
-aic_l <- round(aic_l,4)
-aic_p <- round(aic_p,4)
-aic_c <- round(aic_c,4)
-
-tab <- cbind(c("Logito", "Probito", "Cauchy"), c(aic_l,aic_p,aic_c))
-colnames(tab) <- c("Função", "AIC")
-
-tab %>%
-  kbl(
-    caption = "Valores de AIC dos modelos para cada função de ligação.",
-    digits = 4,
-    format.args=list(big.mark=".", decimal.mark=","),
-    align = "c", 
-    row.names = F,
-  ) %>%
-  kable_styling(
-    full_width = F, position = 'center', 
-    latex_options = c("striped", "HOLD_position", "repeat_header")
-  )|>
-  column_spec(1, bold = T
-  )|>
-  kable_material()
-```
-
-Desta forma, verifica-se que a diferença entre os modelos é bastante
-sutil e não há necessidade de se valer de uma função de ligação
-diferente da canônica para explicar os dados. Assim a função de ligação
-logito é preferível dentre as demais.
-
-## Resultados Inferenciais
 
 ### Estimativas pontuais
 
@@ -323,49 +264,8 @@ Os valores estimados foram de $\alpha =$ `r round(alpha,4)` e de
 $\beta_1 =$ `r round(beta,4)`. Com `r k` iterações obteve-se a precisão
 de $10^{-6}$.
 
-### Discussão dos resultados
-
-Todos os coeficientes foram significativos ao nível de 5\%. Como a variável score não assume valor zero, o coeficiente do intercepto não apresenta interpretabilidade. A variável score apresenta um coeficiente de -0.3235. Isso indica que, a chance do idoso apresentar caduquice com o aumento de uma unidade na variável score é exp(-0.3235) = 0.7236.
 
 
-### Função Desvio
-
-O deviance residual é menor do que a deviance nulo 61.806 e 51.017, respectivamente, e também é mais próximo dos graus de liberdade, o que sugere que o modelo com a variável score se ajusta melhor aos dados do que um modelo que não inclui essa variável. Isso indica que a variável score tem algum poder explicativo na variabilidade da caduquice em idosos e contribui para a melhoria do ajuste do modelo.
-
-
-### Gráficos
-
-Apresente o gráfico da função de distribuição acumulada logística (veja
-Aula prática III - dados turbine). Plote o gráfico de $\hat z$ versus
-$\hat \eta$ e comente sobre as evidências de adequacidade da função de
-ligação.
-
-```{R}
-#| echo: false
-#| warning: false
-#| fig-cap: "Função de distribuição acumulada logística"
-#| label: fig-f2
-
-#Kbb
-fit <- fit_l
-w <- fit$weights
-W<-diag(w)
-v<-fit$fitted.values*(1-fit$fitted.values)
-V<-diag(v)
-Kbb<-(t(X)%*%W%*%X)
-
-#Adequacidade da função de ligação
-eta <- fit$linear.predictors
-z <- eta + (df$resp-fit$fitted.values)/(fit$fitted.values*(1-fit$fitted.values))
-
-ggplot()+
-  geom_point(aes(x=eta,y=z))+
-  labs(
-    x = expression(eta),
-    y = "Valor de z"
-  )+
-  theme_minimal(base_size = 12)
-```
 
 ### Análise Residual
 
