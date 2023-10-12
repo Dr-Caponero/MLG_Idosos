@@ -60,7 +60,26 @@ Sem <- dados |> filter(resp==0)
 Os dados são provenientes de (Agresti, 1990, pgs. 122-123). Ao longo deste trabalho, será realizada uma análise descritiva com objetivo de entender um pouco mais as variáveis consideradas, a construção do modelo de regressão com diferentes funções de ligação, a apresentação de resultados inferenciais e estimativas pontuais. Além disso, também será apresentado a análise de resíduos, com foco na identificação de observações atípicas. 
 
 
-## Análise descritiva
+## Modelo
+
+Queremos analisar como o valor do score obtido no exame psicológico impacta na chance de idoso apresentar caducância ou não. Desse modo, o modelo a ser definido será o modelo MLG binomial com função de ligação logito, então sendo $Y_{i}$ a variável que indica se o idoso "i" apresenta caducância ou não, temos que
+
+* $Y_{i}\sim Binomial(1,\mu_{i})$
+* $log(\frac{\mu_{i}}{1-\mu_{i}}) = \alpha + \beta x_{i}$
+
+onde
+
+* $x_{i}$ é a variável score
+* $\frac{\mu_{i}}{1-\mu_{i}}$ é a chance
+* $\alpha$ é o efeito escalar no logarítmo da chance do idoso apresentar caducância 
+* $\beta$ é efeito no logarítmo da chance do idoso apresentar caducância quando uma unidade é adicionada na variável score
+* $exp(\beta)$ é efeito na razão da chance do idoso apresentar caducância quando uma unidade é adicionada na variável score
+* $\alpha$ é o efeito escalar no logarítmo da chance do idoso apresentar caducância ou não.
+
+
+## Resultados
+
+### Análise descritiva
 
 Na amostra de idosos incluídos no estudo, 74% não demonstraram sinais de caduquice. A Tabela 1 apresenta um resumo dos escores registrados por esses idosos.
 
@@ -124,7 +143,7 @@ p <- ggplot(dados, aes(x=resp, y=score)) +
     x = "",
     y = "Valor do Score"
   )+
-  theme_minimal(base_size = 12)
+  theme_bw(base_size = 12)
 p
 
 ```
@@ -136,6 +155,7 @@ variabilidade maior entre a mediana e o terceiro quartil. Tanto pela
 Tabela 1 quanto pela @fig-f1, já é possível notar que há uma tendência a
 qual menores scores estão mais associados com idosos com caducância.
 
+<<<<<<< HEAD
 # Modelo de Regressão Logístico
 ## Definição
 Queremos analisar como o valor do score obtido no exame psicológico impacta na chance de idoso apresentar caducância ou não. Desse modo, o modelo a ser definido será o modelo MLG binomial com função de ligação logito, então sendo $Y_{i}$ a variável que indica se o idoso "i" apresenta caducância ou não, temos que
@@ -153,6 +173,10 @@ onde
 * $\alpha$ é o efeito escalar no logarítmo da chance do idoso apresentar caducância ou não.
 
 ## Resultados Inferenciais
+=======
+
+### Modelo de regressão logística
+>>>>>>> ae37e8d0d21b00c985722eafd2fea3a65f83b849
 
 Na Tabela 2 abaixo, podemos notar as estimativas do intercepto ($\alpha$) e do coeficiente da variável score ($\beta$) foram significativas ao nível de 5%. Como a variável score não assume valor zero, o coeficiente do intercepto não apresenta interpretabilidade. O valor do coeficiente do score foi igual a -0,3235, ou seja,  adicionar uma unidade na variável score é responsável por uma diminuição de 0,3235 no logarítmo da chance do idoso apresentar caducância. Outra interpretação é que adicionar uma unidade na variável score é reponsável por uma dimunuição de 27,64%($1-exp(-0,3235) = 0,2764$) na chance do idoso apresentar caduância.
 
@@ -184,7 +208,44 @@ tab_l %>%
   kable_material()
 ```
 
+<<<<<<< HEAD
 
+=======
+Todos os coeficientes foram significativos ao nível de 5\%. Como a variável score não assume valor zero, o coeficiente do intercepto não apresenta interpretabilidade. A variável score apresenta um coeficiente de -0.3235. Isso indica que, a chance do idoso apresentar caduquice com o aumento de uma unidade na variável score é exp(-0.3235) = 0.7236.
+
+O deviance residual é menor do que a deviance nulo 61.806 e 51.017, respectivamente, e também é mais próximo dos graus de liberdade, o que sugere que o modelo com a variável score se ajusta melhor aos dados do que um modelo que não inclui essa variável. Isso indica que a variável score tem algum poder explicativo na variabilidade da caduquice em idosos.
+
+
+
+```{R}
+#| echo: false
+#| warning: false
+#| fig-cap: "Função de distribuição acumulada logística"
+#| label: fig-f2
+
+#Kbb
+fit <- fit_l
+w <- fit$weights
+W<-diag(w)
+v<-fit$fitted.values*(1-fit$fitted.values)
+V<-diag(v)
+X <- model.matrix(fit)
+Kbb<-(t(X)%*%W%*%X)
+
+#Adequacidade da função de ligação
+eta <- fit$linear.predictors
+z <- eta + (df$resp-fit$fitted.values)/(fit$fitted.values*(1-fit$fitted.values))
+
+ggplot()+
+  geom_point(aes(x=eta,y=z))+
+  labs(
+    x = expression(eta),
+    y = "Valor de z"
+  )+
+  theme_bw(base_size = 12)
+```
+
+>>>>>>> ae37e8d0d21b00c985722eafd2fea3a65f83b849
 
 ### Estimativas pontuais
 
@@ -227,6 +288,7 @@ Os valores estimados foram de $\alpha =$ `r round(alpha,4)` e de
 $\beta_1 =$ `r round(beta,4)`. Com `r k` iterações obteve-se a precisão
 de $10^{-6}$.
 
+<<<<<<< HEAD
 ### Discussão dos resultados
 
 ### Função Desvio
@@ -267,6 +329,10 @@ ggplot()+
   )+
   theme_minimal(base_size = 12)
 ```
+=======
+
+
+>>>>>>> ae37e8d0d21b00c985722eafd2fea3a65f83b849
 
 ### Análise Residual
 
