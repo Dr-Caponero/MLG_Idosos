@@ -154,7 +154,7 @@ onde
 
 ## Resultados Inferenciais
 
-Na Tabela 2 abaixo, podemos notar as estimativas do intercepto ($\alpha$) e do coeficiente da variável score ($\beta$) foram significativas ao nível de 5%. O valor do coeficiente do score foi igual a -0,3235, ou seja,  adicionar uma unidade na variável score é responsável por uma diminuição de 0,3235 no logarítmo da chance do idoso apresentar caducância. Outra interpretação é que adicionar uma unidade na variável score é reponsável por uma dimunuição de $exp(1)$
+Na Tabela 2 abaixo, podemos notar as estimativas do intercepto ($\alpha$) e do coeficiente da variável score ($\beta$) foram significativas ao nível de 5%. Como a variável score não assume valor zero, o coeficiente do intercepto não apresenta interpretabilidade. O valor do coeficiente do score foi igual a -0,3235, ou seja,  adicionar uma unidade na variável score é responsável por uma diminuição de 0,3235 no logarítmo da chance do idoso apresentar caducância. Outra interpretação é que adicionar uma unidade na variável score é reponsável por uma dimunuição de 27,64%($1-exp(-0,3235) = 0,2764$) na chance do idoso apresentar caduância.
 
 ```{r}
 #| echo: false
@@ -184,102 +184,6 @@ tab_l %>%
   kable_material()
 ```
 
-```{r }
-#| echo: false
-#| warning: false
-
-fit_p <- glm(resp~score, data=dados, family = binomial(link="probit"))
-tab_p <- summary(fit_p)
-tab_p <- tab_p$coefficients
-rownames(tab_p) <- c("Intercepto", "Score")
-colnames(tab_p) <- c("Estimativa", "EP", "Est. z", "Pr(>|z|)")
-parametros_p <- confint(fit_p)
-tab_p %>%
-  kbl(
-    caption = "Resultados para o modelo com função de ligação probito.",
-    digits = 4,
-    format.args=list(big.mark=".", decimal.mark=","),
-    align = "c", 
-    row.names = T,
-  ) %>%
-  kable_styling(
-    full_width = F, position = 'center', 
-    latex_options = c("striped", "HOLD_position", "repeat_header")
-  )|>
-  column_spec(1, bold = T
-  )|>
-  kable_material()
-```
-
-```{r}
-#| echo: false
-#| warning: false
-
-fit_c <- glm(resp~score, data=dados, family = binomial(link="cauchit"))
-tab_c <- summary(fit_c)
-tab_c <- tab_c$coefficients
-rownames(tab_c) <- c("Intercepto", "Score")
-colnames(tab_c) <- c("Estimativa", "EP", "Est. z", "Pr(>|z|)")
-parametros_c <- confint(fit_c)
-tab_c %>%
-  kbl(
-    caption = "Resultados para o modelo com função de ligação cauchy.",
-    digits = 4,
-    format.args=list(big.mark=".", decimal.mark=","),
-    align = "c", 
-    row.names = T,
-  ) %>%
-  kable_styling(
-    full_width = F, position = 'center', 
-    latex_options = c("striped", "HOLD_position", "repeat_header")
-  )|>
-  column_spec(1, bold = T
-  )|>
-  kable_material()
-```
-
-Os modelos apresentados nas Tabelas 2, 3 e 4 são bastante similares. Uma
-comparação mais acurada dos modelos pode ser verificada a partir dos
-valores de AIC atingidos. A Tabela 5 mostra esses valores.
-
-```{r}
-#| echo: false
-#| warning: false
-
-aic_l <- summary(fit_l)[5]
-aic_p <- summary(fit_p)[5]
-aic_c <- summary(fit_c)[5]
-aic_l <- as.numeric(aic_l)
-aic_p <- as.numeric(aic_p)
-aic_c <- as.numeric(aic_c)
-aic_l <- round(aic_l,4)
-aic_p <- round(aic_p,4)
-aic_c <- round(aic_c,4)
-
-tab <- cbind(c("Logito", "Probito", "Cauchy"), c(aic_l,aic_p,aic_c))
-colnames(tab) <- c("Função", "AIC")
-
-tab %>%
-  kbl(
-    caption = "Valores de AIC dos modelos para cada função de ligação.",
-    digits = 4,
-    format.args=list(big.mark=".", decimal.mark=","),
-    align = "c", 
-    row.names = F,
-  ) %>%
-  kable_styling(
-    full_width = F, position = 'center', 
-    latex_options = c("striped", "HOLD_position", "repeat_header")
-  )|>
-  column_spec(1, bold = T
-  )|>
-  kable_material()
-```
-
-Desta forma, verifica-se que a diferença entre os modelos é bastante
-sutil e não há necessidade de se valer de uma função de ligação
-diferente da canônica para explicar os dados. Assim a função de ligação
-logito é preferível dentre as demais.
 
 
 ### Estimativas pontuais
@@ -325,13 +229,10 @@ de $10^{-6}$.
 
 ### Discussão dos resultados
 
-Todos os coeficientes foram significativos ao nível de 5\%. Como a variável score não assume valor zero, o coeficiente do intercepto não apresenta interpretabilidade. A variável score apresenta um coeficiente de -0.3235. Isso indica que, a chance do idoso apresentar caduquice com o aumento de uma unidade na variável score é exp(-0.3235) = 0.7236.
-
-
 ### Função Desvio
 
-Interpretação da função desvio. Compare o valor da função desvio com a
-estatística qui-quadrado e interprete o resultado do teste de hipótese.
+O deviance residual é menor do que a deviance nulo 61.806 e 51.017, respectivamente, e também é mais próximo dos graus de liberdade, o que sugere que o modelo com a variável score se ajusta melhor aos dados do que um modelo que não inclui essa variável. Isso indica que a variável score tem algum poder explicativo na variabilidade da caduquice em idosos e contribui para a melhoria do ajuste do modelo.
+
 
 ### Gráficos
 
